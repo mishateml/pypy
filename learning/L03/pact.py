@@ -1,3 +1,4 @@
+import string
 from pprint import pprint
 from random import choice
 from operator import itemgetter
@@ -21,13 +22,26 @@ me = {
 
 # simple print
 
-print("\n-----=====simple print ====-----")
-print("me", me)
-print("name is", me["name"])
+# print("\n-----=====simple print ====-----")
+# print("me", me)
+# print("name is", me["name"])
+#
+# print("\n-----=====pprint print ====-----")
+# pprint(me)
+#
+# print("\n-----=====H readable print ====-----")
+# for k, v in me.items():
+#     print(f"{k:>16} : {v}")
 
-print("\n-----=====pprint print ====-----")
-pprint(me)
+devices = list() # Empty list
 
-print("\n-----=====H readable print ====-----")
-for k, v in me.items():
-    print(f"{k:>16} : {v}")
+for index in range(100):
+
+    device = dict()
+
+    device["name"] = (
+        choice(["r2", "r3","r4","r6","r10"])
+        + choice(["L","U"])
+        + choice(string.ascii_letters)
+    )
+
